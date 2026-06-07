@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --anim-hotspot-pulse-duration: 4s;
+  --anim-hotspot-float-duration: 4s;
+  --anim-hotspot-icon-duration: 3s;
+  --anim-nav-bounce-duration: 2.5s;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes hotspotPulse {
+  0% { transform: scale(0.6); opacity: 0; }
+  25% { transform: scale(1); opacity: 0.25; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  75% { transform: scale(1.8); opacity: 0.2; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.animate-hotspot-pulse {
+  animation: hotspotPulse var(--anim-hotspot-pulse-duration) linear infinite;
+}
+
+@keyframes hotspotFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-hotspot-float {
+  animation: hotspotFloat var(--anim-hotspot-float-duration) ease-in-out infinite;
+}
+
+@keyframes hotspotIcon {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-hotspot-icon {
+  animation: hotspotIcon var(--anim-hotspot-icon-duration) ease-in-out infinite;
+}
+
+@keyframes navBounce {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-nav-bounce {
+  animation: navBounce var(--anim-nav-bounce-duration) ease-in-out infinite;
+}
