@@ -22,11 +22,11 @@ export const tourConfig = {
   /** Informasi brand */
   brand: {
     /** Nama lengkap brand */
-    name: "TOMORO CC",
+    name: "THE COFFEE BEEN & TEA LEAF",
     /** Tagline / subtitle */
     tagline: "Virtual Tour 360°",
     /** Nama pendek untuk mobile/compact UI */
-    shortName: "TOMORO",
+    shortName: "THE COFFEE BEEN & TEA LEAF",
   },
 
   /** Konfigurasi tur secara umum */
