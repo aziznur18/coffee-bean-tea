@@ -340,7 +340,7 @@ export const tourConfig = {
   <div style="display:flex;flex-wrap:wrap;gap:24px">
     <div style="flex:1 1 280px;min-width:200px">
       <img
-        src="/panoramas/scene-5.jpg"
+        src="/panoramas/webp/scene-5.webp"
         alt="The Coffee Bean &amp; Tea Leaf"
         style="width:100%;height:auto;border-radius:16px;object-fit:cover;box-shadow:0 8px 30px rgba(0,0,0,0.5);aspect-ratio:3/4;display:block"
       />
