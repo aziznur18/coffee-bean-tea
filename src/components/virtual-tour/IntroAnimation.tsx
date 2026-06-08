@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { tourConfig } from "@/config/tour.config";
@@ -20,22 +20,26 @@ const {
 
 export default function IntroAnimation({ ready, onFinish }: IntroAnimationProps) {
   const { camera } = useThree();
+  const cameraRef = useRef(camera);
   const initializedRef = useRef(false);
   const finishedRef = useRef(false);
   const holdTimerRef = useRef(0);
   const animTimerRef = useRef(0);
   const quatStartRef = useRef(new THREE.Quaternion());
   const quatEndRef = useRef(new THREE.Quaternion());
+  const enabled = tourConfig.intro.enabled;
 
-  if (!tourConfig.intro.enabled) {
-    finishedRef.current = true;
-    return null;
-  }
+  useEffect(() => {
+    if (!enabled) {
+      finishedRef.current = true;
+      onFinish();
+    }
+  }, [enabled, onFinish]);
 
   useFrame((_, delta) => {
-    const cam = camera as THREE.PerspectiveCamera;
+    const cam = cameraRef.current as THREE.PerspectiveCamera;
 
-    if (finishedRef.current) return;
+    if (!enabled || finishedRef.current) return;
 
     if (!initializedRef.current) {
       cam.fov = START_FOV;
@@ -80,6 +84,8 @@ export default function IntroAnimation({ ready, onFinish }: IntroAnimationProps)
       onFinish();
     }
   });
+
+  if (!enabled) return null;
 
   return null;
 }

@@ -7,7 +7,6 @@ import { OrbitControls, Preload, DeviceOrientationControls } from "@react-three/
 import { tourConfig } from "@/config/tour.config";
 import { sceneLookup } from "@/config/scenes.config";
 import { useTourStore } from "@/store/tour-store";
-import { type HotspotType } from "@/config/hotspot-variants.config";
 import Hotspot from "@/components/virtual-tour/Hotspot";
 import Controls from "@/components/virtual-tour/Controls";
 import PanoramaSphere from "@/components/virtual-tour/PanoramaSphere";
@@ -20,6 +19,8 @@ export default function Viewer() {
   const [autoRotateSpeed, setAutoRotateSpeed] = useState(0);
 
   const isTourReady = useTourStore((s) => s.isTourReady);
+  const isIntroFinished = useTourStore((s) => s.isIntroFinished);
+  const setIntroFinished = useTourStore((s) => s.setIntroFinished);
   const isTransitioning = useTourStore((s) => s.isTransitioning);
   const autoRotate = useTourStore((s) => s.autoRotate);
   const useGyro = useTourStore((s) => s.useGyro);
@@ -29,7 +30,6 @@ export default function Viewer() {
   const setNextScene = useTourStore((s) => s.setNextScene);
   const setTransitionType = useTourStore((s) => s.setTransitionType);
 
-  const [isIntroFinished, setIsIntroFinished] = useState(false);
   const introPlayedRef = useRef(false);
 
   const cam = tourConfig.camera;
@@ -54,11 +54,18 @@ export default function Viewer() {
   }, [isTransitioning, isTourReady, useGyro, setAutoRotate, ar.inertiaTimeoutMs]);
 
   useEffect(() => {
-    if (isTourReady) startInactivityTimer();
+    if (!tourConfig.intro.enabled) {
+      introPlayedRef.current = true;
+      setIntroFinished();
+    }
+  }, [setIntroFinished]);
+
+  useEffect(() => {
+    if (isTourReady && isIntroFinished) startInactivityTimer();
     return () => {
       if (interactTimeoutRef.current) clearTimeout(interactTimeoutRef.current);
     };
-  }, [startInactivityTimer, isTourReady]);
+  }, [startInactivityTimer, isTourReady, isIntroFinished]);
 
   useEffect(() => {
     if (!autoRotate || isTransitioning) return;
@@ -124,20 +131,24 @@ export default function Viewer() {
         <Preload all />
         <Controls controlsRef={controlsRef} />
         <PanoramaSphere currentScene={currentScene} />
-        {showHotspots &&
+        {isIntroFinished &&
+          showHotspots &&
           !isTransitioning &&
           sceneData?.hotspots.map((hotspot) => (
             <Hotspot
               key={hotspot.id}
               position={hotspot.position}
-              type={hotspot.variant as HotspotType}
+              type={hotspot.type}
               rotation={hotspot.rotation}
+              scale={hotspot.scale}
+              icon={hotspot.icon}
               onClick={() => handleSceneChange(hotspot.target, hotspot.transitionType)}
             />
           ))}
         {useGyro && <DeviceOrientationControls />}
+        {/* eslint-disable-next-line react-hooks/refs */}
         {!introPlayedRef.current && currentScene === "scene_1" && (
-          <IntroAnimation ready={isTourReady} onFinish={() => { introPlayedRef.current = true; setIsIntroFinished(true); }} />
+          <IntroAnimation ready={isTourReady} onFinish={() => { introPlayedRef.current = true; setIntroFinished(); }} />
         )}
         <OrbitControls
           ref={controlsRef}

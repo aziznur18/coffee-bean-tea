@@ -3,10 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --anim-hotspot-pulse-duration: 4s;
-  --anim-hotspot-float-duration: 4s;
-  --anim-hotspot-icon-duration: 3s;
-  --anim-nav-bounce-duration: 2.5s;
+  --anim-hotspot-pulse-duration: 2s;
+  --anim-hotspot-breath-duration: 2.5s;
+  --anim-nav-glow-duration: 2s;
 }
 
 @theme inline {
@@ -29,44 +28,58 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* ── Double pulse ring ── */
 @keyframes hotspotPulse {
-  0% { transform: scale(0.6); opacity: 0; }
-  25% { transform: scale(1); opacity: 0.25; }
-  50% { transform: scale(1.5); opacity: 0.5; }
-  75% { transform: scale(1.8); opacity: 0.2; }
-  100% { transform: scale(2); opacity: 0; }
+  0%   { transform: scale(0.35); opacity: 0.7; }
+  50%  { transform: scale(1.4);  opacity: 0.3; }
+  100% { transform: scale(2.2);  opacity: 0; }
 }
 
 .animate-hotspot-pulse {
-  animation: hotspotPulse var(--anim-hotspot-pulse-duration) linear infinite;
+  animation: hotspotPulse var(--anim-hotspot-pulse-duration) ease-out infinite;
 }
 
-@keyframes hotspotFloat {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0px); }
+.animate-hotspot-pulse-delayed {
+  animation: hotspotPulse var(--anim-hotspot-pulse-duration) ease-out infinite;
+  animation-delay: calc(var(--anim-hotspot-pulse-duration) / -2);
 }
 
-.animate-hotspot-float {
-  animation: hotspotFloat var(--anim-hotspot-float-duration) ease-in-out infinite;
+/* ── Float + breath + glow for icon hotspots ── */
+@keyframes hotspotFloatBreath {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: brightness(1) drop-shadow(0 0 8px rgba(255,255,255,0.3));
+  }
+  50% {
+    transform: translateY(-10px) scale(1.12);
+    filter: brightness(1.35) drop-shadow(0 0 35px rgba(255,255,255,0.9));
+  }
 }
 
-@keyframes hotspotIcon {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-2px); }
-  100% { transform: translateY(0px); }
+.animate-hotspot-float-breath {
+  animation: hotspotFloatBreath var(--anim-hotspot-breath-duration) ease-in-out infinite;
 }
 
-.animate-hotspot-icon {
-  animation: hotspotIcon var(--anim-hotspot-icon-duration) ease-in-out infinite;
+/* ── Glow pulse for navigation arrows ── */
+@keyframes navGlowPulse {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 8px rgba(255,255,255,0.2));
+  }
+  50% {
+    filter: brightness(1.5) drop-shadow(0 0 50px rgba(255,255,255,1));
+  }
 }
 
-@keyframes navBounce {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-  100% { transform: translateY(0px); }
+.animate-nav-glow {
+  animation: navGlowPulse var(--anim-nav-glow-duration) ease-in-out infinite;
 }
 
-.animate-nav-bounce {
-  animation: navBounce var(--anim-nav-bounce-duration) ease-in-out infinite;
+/* ── Tick rotate (steps/jarum jam) ── */
+@keyframes tickRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-tick-rotate {
+  animation: tickRotate 3s steps(12) infinite;
 }

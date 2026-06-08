@@ -9,8 +9,10 @@ export interface TourState {
   showHotspots: boolean;
   autoRotate: boolean;
   isTourReady: boolean;
+  isIntroFinished: boolean;
   transition: number;
   fadeOpacity: number;
+  blurIntensity: number;
   transitionType: "fade" | "zoom";
 }
 
@@ -23,8 +25,10 @@ export interface TourActions {
   toggleHotspots: () => void;
   setAutoRotate: (val: boolean) => void;
   setTourReady: () => void;
+  setIntroFinished: () => void;
   setTransition: (fn: (prev: number) => number) => void;
   setFadeOpacity: (val: number | ((prev: number) => number)) => void;
+  setBlurIntensity: (val: number) => void;
   setTransitionType: (type: "fade" | "zoom") => void;
   resetTransition: () => void;
 }
@@ -39,8 +43,10 @@ export const useTourStore = create<TourStore>((set, get) => ({
   showHotspots: true,
   autoRotate: false,
   isTourReady: false,
+  isIntroFinished: false,
   transition: 0,
   fadeOpacity: 0,
+  blurIntensity: 0,
   transitionType: tourConfig.tour.transitionDefault,
 
   setCurrentScene: (scene) => set({ currentScene: scene }),
@@ -59,6 +65,8 @@ export const useTourStore = create<TourStore>((set, get) => ({
 
   setTourReady: () => set({ isTourReady: true }),
 
+  setIntroFinished: () => set({ isIntroFinished: true }),
+
   setTransition: (fn) => set((s) => ({ transition: fn(s.transition) })),
 
   setFadeOpacity: (val) =>
@@ -66,8 +74,10 @@ export const useTourStore = create<TourStore>((set, get) => ({
       fadeOpacity: typeof val === "function" ? val(s.fadeOpacity) : val,
     })),
 
+  setBlurIntensity: (val) => set({ blurIntensity: val }),
+
   setTransitionType: (type) => set({ transitionType: type }),
 
   resetTransition: () =>
-    set({ transition: 0, fadeOpacity: 0, nextScene: null, isTransitioning: false }),
+    set({ transition: 0, fadeOpacity: 0, blurIntensity: 0, nextScene: null, isTransitioning: false }),
 }));

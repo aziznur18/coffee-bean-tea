@@ -5,10 +5,14 @@ import { useProgress } from "@react-three/drei";
 import { tourConfig } from "@/config/tour.config";
 import { useTourStore } from "@/store/tour-store";
 import TourNavbar from "./TourNavbar";
+import TourHeader from "./TourHeader";
+import TourSocial from "./TourSocial";
 
 export default function TourUI({ children }: { children: React.ReactNode }) {
   const fadeOpacity = useTourStore((s) => s.fadeOpacity);
-  const isTourReady = useTourStore((s) => s.isTourReady);
+  const blurIntensity = useTourStore((s) => s.blurIntensity);
+  const isIntroFinished = useTourStore((s) => s.isIntroFinished);
+  const transitionType = useTourStore((s) => s.transitionType);
 
   return (
     <>
@@ -16,11 +20,17 @@ export default function TourUI({ children }: { children: React.ReactNode }) {
       <main className="isolate relative w-screen h-screen overflow-hidden bg-black">
         {children}
         <div
-          className="pointer-events-none absolute inset-0 bg-black transition-opacity duration-75"
-          style={{ opacity: fadeOpacity }}
+          className="pointer-events-none absolute inset-0 bg-black/60 transition-[opacity,backdrop-filter] duration-75"
+          style={{
+            opacity: transitionType === "fade" ? 0 : fadeOpacity,
+            backdropFilter: `blur(${blurIntensity}px)`,
+            WebkitBackdropFilter: `blur(${blurIntensity}px)`,
+          }}
         />
       </main>
-      {isTourReady && <TourNavbar />}
+      {isIntroFinished && <TourSocial />}
+      {isIntroFinished && <TourHeader />}
+      {isIntroFinished && !tourConfig.header.enabled && <TourNavbar />}
     </>
   );
 }
@@ -45,7 +55,13 @@ function LoadingOverlay() {
       }, loading.gpuPaintBufferMs);
       return () => clearTimeout(gpuPaintBuffer);
     }
-  }, [active, progress, onComplete, loading.fadeDurationMs, loading.gpuPaintBufferMs]);
+  }, [
+    active,
+    progress,
+    onComplete,
+    loading.fadeDurationMs,
+    loading.gpuPaintBufferMs,
+  ]);
 
   if (!isVisible) return null;
 
@@ -63,11 +79,19 @@ function LoadingOverlay() {
         <h1 className="text-white text-4xl font-bold tracking-[0.15em] uppercase">
           {loading.title}
         </h1>
-        <p className="text-white/50 text-sm mt-2 tracking-[0.25em]">
-          {loading.subtitle}
-        </p>
+        {loading.subtitleImage ? (
+          <img
+            src={loading.subtitleImage}
+            alt="logo"
+            className="h-28 my-16 object-contain"
+          />
+        ) : loading.subtitle ? (
+          <p className="text-white/50 text-sm mt-2 tracking-[0.25em]">
+            {loading.subtitle}
+          </p>
+        ) : null}
       </div>
-      <div className="relative z-10 mt-16">
+      <div className="relative z-10 my-16">
         <div
           className={`${loading.spinnerSize} rounded-full border-[4px] animate-spin`}
           style={{
@@ -76,10 +100,14 @@ function LoadingOverlay() {
           }}
         />
       </div>
-      <div className="relative z-10 mt-6 text-white/60 text-xs tracking-[0.2em] uppercase animate-pulse">
+      <div className="relative z-10 my-6 text-white/60 text-xs tracking-[0.2em] uppercase animate-pulse">
         {progress === 100
           ? loading.initializingText
           : `${loading.progressText} ${progress.toFixed(0)}%`}
+      </div>
+
+      <div className="relative z-10 mt-16 text-white/40 text-xs">
+        &copy; {new Date().getFullYear()} Unknown. All rights reserved.
       </div>
     </div>
   );

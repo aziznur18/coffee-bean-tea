@@ -223,7 +223,7 @@ export default function TourNavbar() {
               <button
                 onClick={toggleGyro}
                 className={`p-2.5 rounded-xl transition-all ${
-                  features.gyro.showOnDesktop ? "" : "md:flex hidden"
+                   features.gyro.showOnDesktop ? "hidden md:flex" : "flex md:hidden"
                 } ${
                   useGyro ? "text-white shadow-[0_0_15px_rgba(239,120,69,0.3)]" : "text-white/60 hover:bg-white/10 hover:text-white"
                 }`}

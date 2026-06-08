@@ -11,6 +11,10 @@ function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
 
+function easeInOutQuad(t: number): number {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ControlsRef = React.RefObject<any>;
 
@@ -22,6 +26,7 @@ export default function Controls({ controlsRef }: { controlsRef: ControlsRef }) 
   const setIsTransitioning = useTourStore((s) => s.setIsTransitioning);
   const setTransition = useTourStore((s) => s.setTransition);
   const setFadeOpacity = useTourStore((s) => s.setFadeOpacity);
+  const setBlurIntensity = useTourStore((s) => s.setBlurIntensity);
 
   return (
     <>
@@ -34,6 +39,7 @@ export default function Controls({ controlsRef }: { controlsRef: ControlsRef }) 
         setIsTransitioning={setIsTransitioning}
         setTransition={setTransition}
         setFadeOpacity={setFadeOpacity}
+        setBlurIntensity={setBlurIntensity}
       />
       <TourManager controlsRef={controlsRef} />
     </>
@@ -49,6 +55,7 @@ function TransitionController({
   setIsTransitioning,
   setTransition,
   setFadeOpacity,
+  setBlurIntensity,
 }: {
   nextScene: string | null;
   transitionType: "fade" | "zoom";
@@ -58,6 +65,7 @@ function TransitionController({
   setIsTransitioning: (v: boolean) => void;
   setTransition: (fn: (prev: number) => number) => void;
   setFadeOpacity: (val: number | ((prev: number) => number)) => void;
+  setBlurIntensity: (val: number) => void;
 }) {
   const { camera } = useThree();
   const trans = tourConfig.transitions;
@@ -75,19 +83,42 @@ function TransitionController({
     setTransition((prev) => {
       const next = prev + trans.speed;
       const cam = camera as THREE.PerspectiveCamera;
+      const progress = Math.min(next, 1);
 
       if (transitionType === "zoom") {
-        const eased = easeOutCubic(Math.min(next, 1));
-        cam.fov = THREE.MathUtils.lerp(camConfig.fov, trans.zoom.fovEnd, eased);
+        if (progress <= 0.3) {
+          // Phase 1: Zoom in — FOV 75→50, blur mulai
+          const p = progress / 0.3;
+          const eased = easeOutCubic(p);
+          cam.fov = THREE.MathUtils.lerp(camConfig.fov, trans.zoom.fovEnd, eased);
+          setBlurIntensity(easeInOutQuad(p) * 8);
+          setFadeOpacity(0);
+        } else if (progress <= 0.5) {
+          // Phase 2: Push through + blur tunnel — FOV 50→100, blur naik
+          const p = (progress - 0.3) / 0.2;
+          const eased = easeInOutQuad(p);
+          cam.fov = THREE.MathUtils.lerp(trans.zoom.fovEnd, trans.zoom.zoomOutFov, eased);
+          setBlurIntensity(8 + easeInOutQuad(p) * 7);
+          setFadeOpacity(easeInOutQuad(p));
+        } else if (progress <= 0.75) {
+          // Phase 3: Scene B reveal — FOV 100→75, blur turun
+          const p = (progress - 0.5) / 0.25;
+          const eased = easeInOutQuad(p);
+          cam.fov = THREE.MathUtils.lerp(trans.zoom.zoomOutFov, camConfig.fov, eased);
+          setBlurIntensity((1 - eased) * 15);
+          setFadeOpacity(1 - eased);
+        } else {
+          // Phase 4: Settle
+          cam.fov = camConfig.fov;
+          setBlurIntensity(0);
+          setFadeOpacity(0);
+        }
         cam.updateProjectionMatrix();
       }
 
       if (transitionType === "fade") {
-        if (next <= 0.5) {
-          setFadeOpacity(next * 2);
-        } else {
-          setFadeOpacity((1 - next) * 2);
-        }
+        setBlurIntensity(0);
+        setFadeOpacity(1 - Math.min(next, 1));
       }
 
       if (next >= 0.5 && nextScene) {
@@ -98,6 +129,7 @@ function TransitionController({
         setNextScene(null);
         setIsTransitioning(false);
         setFadeOpacity(0);
+        setBlurIntensity(0);
         cam.fov = camConfig.fov;
         cam.updateProjectionMatrix();
 
