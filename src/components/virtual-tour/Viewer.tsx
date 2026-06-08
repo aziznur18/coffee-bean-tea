@@ -109,6 +109,7 @@ export default function Viewer() {
   return (
     <Canvas
       flat
+      dpr={[1, 2]}
       camera={{
         position: [startX, 0, startZ],
         fov: cam.fov,

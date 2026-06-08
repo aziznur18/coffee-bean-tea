@@ -31,7 +31,7 @@ const scenesList: SceneData[] = [
   {
     id: "scene_1",
     name: "Depan",
-    image: "/panoramas/scene-1.jpg",
+    image: "/panoramas/webp/scene-1.webp",
     initialView: { yaw: -100 },
     hotspots: [
       {
@@ -53,7 +53,7 @@ const scenesList: SceneData[] = [
   {
     id: "scene_2",
     name: "Lantai 1",
-    image: "/panoramas/scene-2.jpg",
+    image: "/panoramas/webp/scene-2.webp",
     initialView: { yaw: 220 },
     hotspots: [
       {
@@ -79,7 +79,7 @@ const scenesList: SceneData[] = [
   {
     id: "scene_3",
     name: "Lantai 2 Tangga",
-    image: "/panoramas/scene-3.jpg",
+    image: "/panoramas/webp/scene-3.webp",
     initialView: { yaw: 60 },
     hotspots: [
       {
@@ -107,7 +107,7 @@ const scenesList: SceneData[] = [
   {
     id: "scene_4",
     name: "No Smoking Room",
-    image: "/panoramas/scene-4.jpg",
+    image: "/panoramas/webp/scene-4.webp",
     initialView: { yaw: 180 },
     hotspots: [
       {
@@ -125,7 +125,7 @@ const scenesList: SceneData[] = [
   {
     id: "scene_5",
     name: "Smoking Room",
-    image: "/panoramas/scene-5.jpg",
+    image: "/panoramas/webp/scene-5.webp",
     initialView: { yaw: 222 },
     hotspots: [
       {
@@ -161,7 +161,7 @@ const scenesList: SceneData[] = [
   {
     id: "scene_6",
     name: "Smoking Room View",
-    image: "/panoramas/scene-6.jpg",
+    image: "/panoramas/webp/scene-6.webp",
     initialView: { yaw: 100 },
     hotspots: [
       {
@@ -179,7 +179,7 @@ const scenesList: SceneData[] = [
   {
     id: "scene_7",
     name: "Smoking Room View",
-    image: "/panoramas/scene-7.jpg",
+    image: "/panoramas/webp/scene-7.webp",
     initialView: { yaw: 100 },
     hotspots: [
       {

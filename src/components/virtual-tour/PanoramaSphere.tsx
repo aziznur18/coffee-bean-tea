@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { tourConfig } from "@/config/tour.config";
 import { sceneKeys, sceneLookup } from "@/config/scenes.config";
 import { useTourStore } from "@/store/tour-store";
-
-sceneKeys.forEach((key) => {
-  useTexture.preload(sceneLookup[key].image);
-});
 
 export default function PanoramaSphere({ currentScene }: { currentScene: string }) {
   const textures = useTexture(sceneKeys.map((key) => sceneLookup[key].image));
@@ -30,21 +26,26 @@ export default function PanoramaSphere({ currentScene }: { currentScene: string 
       texture.generateMipmaps = perf.generateMipmaps;
       texture.minFilter = THREE.LinearFilter;
       texture.magFilter = THREE.LinearFilter;
-      texture.anisotropy = gl.capabilities.getMaxAnisotropy();
+      texture.anisotropy = 4;
       texture.needsUpdate = true;
     });
   }, [textures, gl, perf.generateMipmaps]);
 
-  const textureMap = sceneKeys.reduce(
-    (acc, key, index) => {
-      acc[key] = textures[index];
-      return acc;
-    },
-    {} as Record<string, THREE.Texture>,
+  const textureMap = useMemo(
+    () =>
+      sceneKeys.reduce(
+        (acc, key, index) => {
+          acc[key] = textures[index];
+          return acc;
+        },
+        {} as Record<string, THREE.Texture>,
+      ),
+    [textures],
   );
 
   const cam = tourConfig.camera;
-  const isCrossFading = !!(transitionType === "fade" && nextScene && fadeOpacity < 1);
+  const needNext = nextScene && nextScene !== currentScene;
+  const isCrossFading = !!(transitionType === "fade" && needNext && fadeOpacity < 1);
 
   return (
     <group>
@@ -59,7 +60,7 @@ export default function PanoramaSphere({ currentScene }: { currentScene: string 
         />
       </mesh>
 
-      {isCrossFading && nextScene && (
+      {isCrossFading && (
         <mesh>
           <sphereGeometry args={[cam.sphereRadius, cam.sphereSegments, cam.sphereSegments]} />
           <meshBasicMaterial
